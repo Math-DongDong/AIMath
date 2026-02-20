@@ -1,2 +1,1 @@
-# AIMath
-인공지능 수학탐구 모음
+[![Streamlit App](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://mathzip.streamlit.app)
