@@ -2,7 +2,7 @@ import streamlit as st
 
 # 1. 페이지 레이아웃 설정
 st.set_page_config(
-    page_title="동동쌤의 수학모음",
+    page_title="동동쌤의 인공지능 수학모음",
     page_icon="./기타/동동이.PNG",
     layout="wide"
 )
