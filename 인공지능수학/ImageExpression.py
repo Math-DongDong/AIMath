@@ -68,7 +68,7 @@ with tab1:
 
         with result:
             st.subheader("변환 이미지")
-            st.image(preview_image, caption="변환 이미지 미리보기", width='stretch')
+            st.image(preview_image, width='stretch')
 
         with original:
             st.subheader("원본 이미지")
