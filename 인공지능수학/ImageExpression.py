@@ -68,11 +68,11 @@ with tab1:
 
         with result:
             st.subheader("변환 이미지")
-            st.image(preview_image, caption=f"축소 후 미리보기: {preview_width} x {preview_height} px", width='stretch')
+            st.image(preview_image, caption="변환 이미지 미리보기", width='stretch')
 
         with original:
             st.subheader("원본 이미지")
-            st.image(image, caption=f"업로드 원본: {uploaded_width} x {uploaded_height} px -> 처리용으로 축소됨", width='stretch')
+            st.image(image, width='stretch')
 
     #================================================================================================
     with st.expander("📂 이미지 업로드 열기/닫기", expanded=True):
