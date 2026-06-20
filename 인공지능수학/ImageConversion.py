@@ -14,7 +14,6 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # 함수정의(탭2, 탭3 공통)
-@st.cache_data(show_spinner=False, ttl=300)
 def load_excel_data(file):
     return pd.read_excel(file, header=None)
 
@@ -25,9 +24,15 @@ def df_to_image(df, scale_factor=20):
     img = Image.fromarray(data)
     original_w, original_h = img.size
     
-    # 화면에 잘 보이도록 확대 (최소 500px)
-    target_w = max(500, original_w * scale_factor)
-    target_h = int(target_w * (original_h / original_w))
+    # 화면용 이미지는 긴 변이 1000px을 넘지 않도록 제한
+    long_side = max(original_w, original_h)
+    if long_side > 1000:
+        scale = 1000 / long_side
+        target_w = max(1, round(original_w * scale))
+        target_h = max(1, round(original_h * scale))
+    else:
+        target_w = original_w
+        target_h = original_h
     
     # NEAREST 옵션으로 픽셀화 효과 유지
     img_resized = img.resize((target_w, target_h), Image.Resampling.NEAREST)
