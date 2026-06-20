@@ -248,17 +248,17 @@ with tab2:
                             for (let c = 0; c < sourceTable.rows[r].cells.length; c++) {
                                 const sourceCell = sourceTable.rows[r].cells[c];
                                 const isBlack = sourceCell.classList.contains('!bg-gray-800'); // 클래스명 확인 수정
-                                const value = isBlack ? 1 : 0;
+                                const value = isBlack ? 0 : 1;
 
                                 const resultTd = document.createElement('td');
                                 resultTd.textContent = value;
                                 
                                 let cellClass = 'w-10 h-10 sm:w-12 sm:h-12 text-center border border-gray-300 text-sm font-mono cursor-default ';
                                 
-                                if (value === 1) {
+                                if (value === 0) {
                                     cellClass += 'bg-gray-800 text-white font-bold';
                                 } else {
-                                    cellClass += 'bg-white text-gray-400';
+                                    cellClass += 'bg-white text-gray-700';
                                 }
                                 
                                 resultTd.className = cellClass;
