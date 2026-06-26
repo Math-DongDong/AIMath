@@ -118,10 +118,10 @@ with tab1:
         with col_res:
             st.subheader("그레이 필터")
 
-            # PIL 내장 그레이스케일 변환으로 비용 절감
-            gray_pil = ImageOps.grayscale(image)
-            gray_matrix = np.array(gray_pil, dtype=np.uint8)
+            # 원본 RGB 값의 평균을 계산하고 소수점 첫째 자리에서 반올림
+            gray_matrix = np.round(np.mean(image_array, axis=2)).astype(np.uint8)
             gray_stacked_arr = np.stack((gray_matrix, gray_matrix, gray_matrix), axis=2)
+            gray_pil = Image.fromarray(gray_stacked_arr)
 
             st.image(gray_pil, caption="그레이 필터 적용", width='stretch')
 
