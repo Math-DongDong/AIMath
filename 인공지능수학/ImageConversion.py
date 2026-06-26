@@ -49,7 +49,6 @@ tab1, tab2, tab3 = st.tabs(["🔘 그레이 필터", "💡 밝기 조절", "➕ 
 with tab1:
     # ==============================================================================
     # 업로드된 파일을 PIL 이미지 객체로 변환
-    @st.cache_data(show_spinner=False, ttl=300)
     def load_image(image_bytes, max_side=1000):
         image = Image.open(io.BytesIO(image_bytes))
         image = ImageOps.exif_transpose(image).convert('RGB')
