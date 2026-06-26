@@ -74,7 +74,7 @@ with tab1:
             )
 
             if is_resized:
-                st.caption("⚠️ 원본 이미지의 해상도가 너무 커서 주어진 해상도로 축소된 이미지입니다.")
+                st.caption(f"⚠️ 원본 이미지({uploaded_width} x {uploaded_height})가 너무 커서 현재 {preview_width} x {preview_height}로 축소되어 표시됩니다.")
 
         with result:
             st.subheader("변환 이미지")
@@ -82,8 +82,6 @@ with tab1:
 
         with original:
             st.subheader("원본 이미지")
-            if is_resized:
-                st.caption(f"※ 원본 이미지({uploaded_width} x {uploaded_height})가 너무 커서 현재 {preview_width} x {preview_height}로 축소되어 표시됩니다.")
             st.image(image, width='stretch')
 
     #================================================================================================
