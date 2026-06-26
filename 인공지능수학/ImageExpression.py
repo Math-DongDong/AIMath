@@ -53,7 +53,6 @@ with tab1:
                 value=preview_height, 
                 step=1
             )
-            st.caption(f"최대값은 현재 사용 중인 이미지 크기에 맞춰져 있습니다. ({preview_width} x {preview_height})")
 
             # 이미지 처리 (NEAREST) - 픽셀화 효과를 준 이후 원본사이즈로 확대 후 다시 픽셀화
             pixelated_image = image.resize((new_width, new_height), Image.Resampling.NEAREST)
