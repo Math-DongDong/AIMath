@@ -20,17 +20,21 @@ with tab1:
 
         original_width, original_height = image.size
         max_side = max(original_width, original_height)
-        if max_side > 1000:
-            scale = 1000 / max_side
-            new_width = max(1, round(original_width * scale))
-            new_height = max(1, round(original_height * scale))
-            image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
+        is_resized = False
+        display_width, display_height = original_width, original_height
 
-        return image, original_width, original_height
+        if max_side > 1000:
+            is_resized = True
+            scale = 1000 / max_side
+            display_width = max(1, round(original_width * scale))
+            display_height = max(1, round(original_height * scale))
+            image = image.resize((display_width, display_height), Image.Resampling.LANCZOS)
+
+        return image, original_width, original_height, display_width, display_height, is_resized
 
     # 해상도 변환 프레그먼트
     @st.fragment
-    def image_editor_fragment(image, uploaded_width, uploaded_height, preview_width, preview_height, filename):
+    def image_editor_fragment(image, uploaded_width, uploaded_height, preview_width, preview_height, filename, is_resized):
         # [설정 / 변환 결과 / 원본]
         edit,result , original = st.columns([0.2, 0.4, 0.4])
         with edit:
@@ -38,15 +42,18 @@ with tab1:
             new_width = st.number_input(
                 "가로(Width) 픽셀", 
                 min_value=1, 
+                max_value=preview_width,
                 value=preview_width, 
                 step=1
             )
             new_height = st.number_input(
                 "세로(Height) 픽셀", 
                 min_value=1, 
+                max_value=preview_height,
                 value=preview_height, 
                 step=1
             )
+            st.caption(f"최대값은 현재 사용 중인 이미지 크기에 맞춰져 있습니다. ({preview_width} x {preview_height})")
 
             # 이미지 처리 (NEAREST) - 픽셀화 효과를 준 이후 원본사이즈로 확대 후 다시 픽셀화
             pixelated_image = image.resize((new_width, new_height), Image.Resampling.NEAREST)
@@ -66,12 +73,17 @@ with tab1:
                 width='stretch'
             )
 
+            if is_resized:
+                st.caption("⚠️ 원본 이미지의 해상도가 너무 커서 주어진 해상도로 축소된 이미지입니다.")
+
         with result:
             st.subheader("변환 이미지")
             st.image(preview_image, width='stretch')
 
         with original:
             st.subheader("원본 이미지")
+            if is_resized:
+                st.caption(f"※ 원본 이미지({uploaded_width} x {uploaded_height})가 너무 커서 현재 {preview_width} x {preview_height}로 축소되어 표시됩니다.")
             st.image(image, width='stretch')
 
     #================================================================================================
@@ -80,13 +92,13 @@ with tab1:
         uploaded_file = st.file_uploader("이미지 파일을 업로드하세요.", type=["png", "jpg", "jpeg"])
 
     if uploaded_file is not None:
-        image, uploaded_width, uploaded_height = load_image(uploaded_file)
+        image, uploaded_width, uploaded_height, preview_width, preview_height, is_resized = load_image(uploaded_file)
         
         # 축소 후 이미지 정보 가져오기
-        preview_width, preview_height = image.size
+        # preview_width/preview_height는 실제로 사용 중인 이미지 최대 크기입니다.
 
         # 이미지 편집 프레그먼트 호출
-        image_editor_fragment(image, uploaded_width, uploaded_height, preview_width, preview_height, uploaded_file.name)            
+        image_editor_fragment(image, uploaded_width, uploaded_height, preview_width, preview_height, uploaded_file.name, is_resized)            
                 
     else:
         st.info("👆 상단의 '이미지 업로드'를 열어 이미지 파일( png, jpg, jpeg )을 먼저 업로드해주세요.")            
