@@ -298,26 +298,8 @@ with tab3:
                     # 4. 결과 저장
                     st.session_state.final_result = res_df
 
-        if "final_result" in st.session_state and st.session_state.final_result is not None:
-            # [이미지 / 데이터프레임]
-            result_col1, result_col2 = st.columns(2)
-            with result_col1:
-                st.subheader("결과 이미지")
-                img_res, orig_size = df_to_image(st.session_state.final_result)
-                st.image(
-                    img_res,
-                    width='stretch',
-                    clamp=True
-                )
-                
-            with result_col2:
-                st.subheader("결과 행렬")
-                st.dataframe(
-                    st.session_state.final_result,
-                    height=500,
-                    width='stretch'
-                )
-
+                if st.button("🔄 계산 초기화", type="secondary", width='stretch'):
+                    st.session_state.final_result = None
     # ==============================================================================
 
     Uploaded_df1, Uploaded_df2 = None, None
