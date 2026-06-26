@@ -3,4 +3,8 @@
 # showErrorDetails = "none"
 
 # 우측 상단 메뉴 숨김
-toolbarMode = "viewer"
+toolbarMode = "none"
+
+[server]
+# 코드 저장시 자동 앱 새로고침
+runOnSave = true
