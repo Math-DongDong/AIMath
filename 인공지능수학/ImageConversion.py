@@ -329,8 +329,11 @@ with tab3:
             file2 = st.file_uploader("행렬 B (엑셀 파일)", type=['xlsx'], key="file2")
 
     if file1 and file2:
-        Uploaded_df1 = load_excel_data(file1)
-        Uploaded_df2 = load_excel_data(file2)
+        file1_bytes = file1.read()
+        file2_bytes = file2.read()
+
+        Uploaded_df1 = load_excel_data(file1_bytes, file1.name)
+        Uploaded_df2 = load_excel_data(file2_bytes, file2.name)
         
         # 행렬의 크기 검증
         if Uploaded_df1.shape != Uploaded_df2.shape:
