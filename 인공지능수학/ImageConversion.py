@@ -4,9 +4,6 @@ import numpy as np
 import pandas as pd
 from PIL import Image, ImageOps
 
-MAX_IMAGE_UPLOAD_BYTES = 8 * 1024 * 1024  # 8MB
-MAX_EXCEL_UPLOAD_BYTES = 10 * 1024 * 1024  # 10MB
-
 # 커스텀 CSS 적용
 st.markdown("""
 <style>
@@ -107,16 +104,13 @@ with tab1:
         uploaded_file = st.file_uploader("이미지 파일을 업로드하세요.", type=["png", "jpg", "jpeg"])
 
     if uploaded_file is not None:
-        if uploaded_file.size > MAX_IMAGE_UPLOAD_BYTES:
-            st.error(f"업로드 파일이 너무 큽니다. 최대 {MAX_IMAGE_UPLOAD_BYTES // (1024*1024)}MB 이하의 이미지 파일만 허용됩니다.")
-        else:
-            image_bytes = uploaded_file.read()
-            image = load_image(image_bytes)
-            original_width, original_height = image.size
-            image_array = np.array(image)
+        image_bytes = uploaded_file.read()
+        image = load_image(image_bytes)
+        original_width, original_height = image.size
+        image_array = np.array(image)
 
-            # [원본 / 결과] 
-            col_orig, col_res = st.columns(2, gap="medium")
+        # [원본 / 결과] 
+        col_orig, col_res = st.columns(2, gap="medium")
         with col_orig:
             st.subheader("원본 이미지")
             st.image(image, caption=f"원본 이미지 ( 해상도: {original_width}x{original_height} px )", width='stretch')
@@ -238,12 +232,9 @@ with tab2:
         )
 
     if uploaded_file is not None:
-        if uploaded_file.size > MAX_EXCEL_UPLOAD_BYTES:
-            st.error(f"엑셀 파일이 너무 큽니다. 최대 {MAX_EXCEL_UPLOAD_BYTES // (1024*1024)}MB 이하의 파일만 허용됩니다.")
-        else:
-            excel_bytes = uploaded_file.read()
-            source_df = load_excel_data(excel_bytes, uploaded_file.name)
-            brightness_adjustment(source_df,uploaded_file.name)
+        excel_bytes = uploaded_file.read()
+        source_df = load_excel_data(excel_bytes, uploaded_file.name)
+        brightness_adjustment(source_df,uploaded_file.name)
 
     else:
         # 데이터가 없을 때 안내
