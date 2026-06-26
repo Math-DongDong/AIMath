@@ -1,7 +1,11 @@
+import io
 import streamlit as st
 import numpy as np
 import pandas as pd
-from PIL import Image
+from PIL import Image, ImageOps
+
+MAX_IMAGE_UPLOAD_BYTES = 8 * 1024 * 1024  # 8MB
+MAX_EXCEL_UPLOAD_BYTES = 10 * 1024 * 1024  # 10MB
 
 # 커스텀 CSS 적용
 st.markdown("""
@@ -14,12 +18,14 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # 함수정의(탭2, 탭3 공통)
-def load_excel_data(file):
-    return pd.read_excel(file, header=None)
+@st.cache_data(show_spinner=False, ttl=300)
+def load_excel_data(file_bytes, file_name):
+    return pd.read_excel(io.BytesIO(file_bytes), header=None)
 
+@st.cache_data(show_spinner=False, ttl=300)
 def df_to_image(df, scale_factor=20):
     # 유효 범위(0~255) 클리핑 및 형변환
-    data = df.fillna(0).clip(0, 255).to_numpy().astype(np.uint8)
+    data = df.fillna(0).clip(0, 255).to_numpy(dtype=np.uint8, copy=False)
     
     img = Image.fromarray(data)
     original_w, original_h = img.size
@@ -46,9 +52,21 @@ tab1, tab2, tab3 = st.tabs(["🔘 그레이 필터", "💡 밝기 조절", "➕ 
 with tab1:
     # ==============================================================================
     # 업로드된 파일을 PIL 이미지 객체로 변환
-    @st.cache_data(show_spinner=False,ttl=300)
-    def load_image(image_file):
-        return Image.open(image_file).convert('RGB')
+    @st.cache_data(show_spinner=False, ttl=300)
+    def load_image(image_bytes, max_side=1000):
+        image = Image.open(io.BytesIO(image_bytes))
+        image = ImageOps.exif_transpose(image).convert('RGB')
+
+        original_w, original_h = image.size
+        long_side = max(original_w, original_h)
+
+        if long_side > max_side:
+            scale = max_side / long_side
+            target_w = max(1, round(original_w * scale))
+            target_h = max(1, round(original_h * scale))
+            image = image.resize((target_w, target_h), Image.Resampling.LANCZOS)
+
+        return image
 
     # 함수 정의 (RGB 데이터 시각화)
     def display_channel_data(image_array, title_prefix):
@@ -89,11 +107,16 @@ with tab1:
         uploaded_file = st.file_uploader("이미지 파일을 업로드하세요.", type=["png", "jpg", "jpeg"])
 
     if uploaded_file is not None:
-        image = load_image(uploaded_file)
-        original_width, original_height = image.size
+        if uploaded_file.size > MAX_IMAGE_UPLOAD_BYTES:
+            st.error(f"업로드 파일이 너무 큽니다. 최대 {MAX_IMAGE_UPLOAD_BYTES // (1024*1024)}MB 이하의 이미지 파일만 허용됩니다.")
+        else:
+            image_bytes = uploaded_file.read()
+            image = load_image(image_bytes)
+            original_width, original_height = image.size
+            image_array = np.array(image)
 
-        # [원본 / 결과] 
-        col_orig, col_res = st.columns(2, gap="medium")
+            # [원본 / 결과] 
+            col_orig, col_res = st.columns(2, gap="medium")
         with col_orig:
             st.subheader("원본 이미지")
             st.image(image, caption=f"원본 이미지 ( 해상도: {original_width}x{original_height} px )", width='stretch')
@@ -101,19 +124,18 @@ with tab1:
         with col_res:
             st.subheader("그레이 필터")
 
-            # 그레이스케일 변환 (단순 평균법)
-            gray_matrix = np.round(np.mean(np.array(image), axis=2)).astype(np.uint8)
+            # PIL 내장 그레이스케일 변환으로 비용 절감
+            gray_pil = ImageOps.grayscale(image)
+            gray_matrix = np.array(gray_pil, dtype=np.uint8)
             gray_stacked_arr = np.stack((gray_matrix, gray_matrix, gray_matrix), axis=2)
-            gray_pil = Image.fromarray(gray_stacked_arr)
-                    
+
             st.image(gray_pil, caption="그레이 필터 적용", width='stretch')
 
         # 3. 데이터 분석 표 (하단)
         st.divider()
         
         # (1) 원본 데이터
-        original_array = np.array(image)
-        display_channel_data(original_array, "원본 이미지")
+        display_channel_data(image_array, "원본 이미지")
 
         st.divider()
 
@@ -216,8 +238,12 @@ with tab2:
         )
 
     if uploaded_file is not None:
-        source_df = load_excel_data(uploaded_file)
-        brightness_adjustment(source_df,uploaded_file.name)
+        if uploaded_file.size > MAX_EXCEL_UPLOAD_BYTES:
+            st.error(f"엑셀 파일이 너무 큽니다. 최대 {MAX_EXCEL_UPLOAD_BYTES // (1024*1024)}MB 이하의 파일만 허용됩니다.")
+        else:
+            excel_bytes = uploaded_file.read()
+            source_df = load_excel_data(excel_bytes, uploaded_file.name)
+            brightness_adjustment(source_df,uploaded_file.name)
 
     else:
         # 데이터가 없을 때 안내
