@@ -279,7 +279,7 @@ with tab3:
         with btn_col2:
             st.space()
             with st.container(horizontal=True):
-                if st.button("🚀 계산 실행: (k₁ × A) " + operation + " (k₂ × B)", type="primary", width='stretch'):            
+                if st.button("🚀 계산 실행: (k₁ × A) " + operation + " (k₂ × B)", type="primary", width='stretch'):
                     # 1. 실수배 적용
                     term1 = df1 * scalar1
                     term2 = df2 * scalar2
@@ -297,9 +297,6 @@ with tab3:
                     
                     # 4. 결과 저장
                     st.session_state.final_result = res_df
-
-                if st.button("🔄 계산 초기화", type="secondary", width='stretch'):
-                    st.session_state.final_result = None
     # ==============================================================================
 
     Uploaded_df1, Uploaded_df2 = None, None
