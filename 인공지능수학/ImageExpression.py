@@ -260,7 +260,6 @@ with tab2:
                                 const sourceCell = sourceTable.rows[r].cells[c];
                                 const isBlack = sourceCell.classList.contains('!bg-gray-800'); // 클래스명 확인 수정
                                 const value = isBlack ? 0 : 1;
-이미
                                 const resultTd = document.createElement('td');
                                 resultTd.textContent = value;
                                 
