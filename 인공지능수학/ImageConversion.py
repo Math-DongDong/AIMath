@@ -357,4 +357,4 @@ with tab3:
 
     with st.container(horizontal=True):
         st.space("stretch")
-        st.page_link("https://matharticle.streamlit.app/Dissolve", label="디졸브 효과", icon="🔀", width="content")
+        st.page_link("https://math-dongdong.github.io/MathArticle/%EC%9D%B8%EA%B3%B5%EC%A7%80%EB%8A%A5%EC%88%98%ED%95%99/Dissolve.html", label="디졸브 효과", icon="🔀", width="content")
