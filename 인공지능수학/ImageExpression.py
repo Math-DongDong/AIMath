@@ -91,9 +91,6 @@ with tab1:
     if uploaded_file is not None:
         image, uploaded_width, uploaded_height, preview_width, preview_height, is_resized = load_image(uploaded_file)
         
-        # 축소 후 이미지 정보 가져오기
-        # preview_width/preview_height는 실제로 사용 중인 이미지 최대 크기입니다.
-
         # 이미지 편집 프레그먼트 호출
         image_editor_fragment(image, uploaded_width, uploaded_height, preview_width, preview_height, uploaded_file.name, is_resized)            
                 
