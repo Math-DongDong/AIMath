@@ -1,3 +1,4 @@
+import hashlib
 import io
 import streamlit as st
 import numpy as np
@@ -15,31 +16,37 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # 함수정의(탭2, 탭3 공통)
-@st.cache_data(show_spinner=False, ttl=300)
 def load_excel_data(file_bytes, file_name):
-    return pd.read_excel(io.BytesIO(file_bytes), header=None)
+    cache_key = f"excel_data:{hashlib.sha256(file_bytes).hexdigest()}"
+    if cache_key not in st.session_state:
+        st.session_state[cache_key] = pd.read_excel(io.BytesIO(file_bytes), header=None)
+    return st.session_state[cache_key]
 
-@st.cache_data(show_spinner=False, ttl=300)
+
 def df_to_image(df, scale_factor=20):
     # 유효 범위(0~255) 클리핑 및 형변환
     data = df.fillna(0).clip(0, 255).to_numpy(dtype=np.uint8, copy=False)
-    
-    img = Image.fromarray(data)
-    original_w, original_h = img.size
-    
-    # 화면용 이미지는 긴 변이 1000px을 넘지 않도록 제한
-    long_side = max(original_w, original_h)
-    if long_side > 1000:
-        scale = 1000 / long_side
-        target_w = max(1, round(original_w * scale))
-        target_h = max(1, round(original_h * scale))
-    else:
-        target_w = original_w
-        target_h = original_h
-    
-    # NEAREST 옵션으로 픽셀화 효과 유지
-    img_resized = img.resize((target_w, target_h), Image.Resampling.NEAREST)
-    return img_resized, (original_w, original_h)
+    cache_key = f"df_to_image:{hashlib.sha256(data.tobytes()).hexdigest()}"
+
+    if cache_key not in st.session_state:
+        img = Image.fromarray(data)
+        original_w, original_h = img.size
+
+        # 화면용 이미지는 긴 변이 1000px을 넘지 않도록 제한
+        long_side = max(original_w, original_h)
+        if long_side > 1000:
+            scale = 1000 / long_side
+            target_w = max(1, round(original_w * scale))
+            target_h = max(1, round(original_h * scale))
+        else:
+            target_w = original_w
+            target_h = original_h
+
+        # NEAREST 옵션으로 픽셀화 효과 유지
+        img_resized = img.resize((target_w, target_h), Image.Resampling.NEAREST)
+        st.session_state[cache_key] = (img_resized, (original_w, original_h))
+
+    return st.session_state[cache_key]
 
 # --- 앱 제목 ---
 st.title("이미지 데이터의 변환")
@@ -67,7 +74,7 @@ with tab1:
     # 함수 정의 (RGB 데이터 시각화)
     def display_channel_data(image_array, title_prefix):
         st.markdown(f"#### 📊 {title_prefix}의 RGB 채널")
-        st.caption("좌측 상단(0,0)부터 **8x8 픽셀** 영역의 숫자(0~255)입니다.")
+        st.caption("좌측 상단부터 **8x8 픽셀** 영역의 숫자(0~255)입니다.")
         slice_size = 8
         
         # 배열 크기가 8보다 작을 경우 에러 방지
