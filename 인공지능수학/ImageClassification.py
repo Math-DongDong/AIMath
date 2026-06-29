@@ -5,7 +5,7 @@ import numpy as np
 import tensorflow as tf # 데이터셋 로드용
 
 # 2. [데이터 로드] MNIST 데이터셋 캐싱 (모델 파일 대신 원본 데이터 사용)
-@st.cache_data(show_spinner="MNIST 데이터셋을 다운로드 및 로드 중입니다... (시간이 걸릴 수 있습니다)")
+@st.cache_data(show_spinner="MNIST 데이터셋을 다운로드 및 로드 중입니다... (시간이 걸릴 수 있습니다)",ttl=120)
 def load_mnist_data():
     # Keras를 통해 MNIST 데이터 다운로드
     (x_train, y_train), _ = tf.keras.datasets.mnist.load_data()
