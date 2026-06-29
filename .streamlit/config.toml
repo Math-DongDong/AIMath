@@ -3,7 +3,7 @@
 # showErrorDetails = "none"
 
 # 우측 상단 메뉴 숨김
-toolbarMode = "none"
+toolbarMode = "minimal"
 
 [server]
 # 코드 저장시 자동 앱 새로고침
